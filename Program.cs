@@ -125,6 +125,7 @@ namespace Final_Project
         }
         static void Main()
         {
+            Console.WriteLine("hello world");
             Image test = new Image("testFolder/test4.jpg");
             test = Image.Resize(test,1280,720);
             
