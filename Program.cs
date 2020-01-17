@@ -123,9 +123,9 @@ namespace Final_Project
             }
 
         }
-        static void Main()
+        static void Main(string[] args)
         {
-            Image test = new Image("testFolder/test4.jpg");
+            Image test = new Image(args[0]);
             test = Image.Resize(test,1280,720);
             
             
@@ -137,7 +137,7 @@ namespace Final_Project
 
             Matrix z = W.T* x + b;
             Matrix a = Sigmoid(z);
-            a.Display();
+            Console.WriteLine(a[0]);
         }
     }
 }
