@@ -135,7 +135,7 @@ namespace Final_Project
             
             
             Matrix x = ConvertImageToMatrix(test);
-            Matrix W = new Matrix("W.txt");
+            Matrix W = new Matrix("w.txt");
             Matrix b = new Matrix("b.txt");
 
             Matrix z = W.T* x + b;
