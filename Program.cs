@@ -125,8 +125,10 @@ namespace Final_Project
         }
         static void Main(string[] args)
         {
+            var stopwatch = Stopwatch.StartNew();
             Image test = new Image(args[0]);
             test = Image.Resize(test,1280,720);
+            Console.WriteLine(stopwatch.ElapsedMilliseconds);
             
             
             
