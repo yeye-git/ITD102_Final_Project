@@ -884,6 +884,11 @@ class Matrix
         {
             for (int col = 0; col < matrix.Column; col++)
             {
+                if(matrix[row,col]==0)
+                {
+                    newMatrix[row,col] = double.MinValue;
+                    continue;
+                }
                 newMatrix[row, col] = Math.Log(matrix[row, col]);
             }
         }
