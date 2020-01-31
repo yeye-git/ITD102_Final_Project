@@ -10,27 +10,46 @@ namespace Final_Project
     {
         static void Main(string[] args)
         {
-            
+            string USAGE_INFO = @"
+Usage:
+Train the model
+dotnet run -mode train -trainFolder <path> -labelWord <string> -numIterations <int> -learningRate <double>
+    Parameters:
+        -trainFolder <path> : the path of the directory that contains training images
+        -labelWord <string> : if an image's file name contains the labelWord, it would be identified as a correct answer
+        -numIterations <int> : the number of iterations to train the model (grandient descend)
+        -learningRate <double> : the learning rate to train the model
 
-            Train(@"D:\C# projects\ITD102_Final_Project_old\train", 25);
-            return;
-            // load an input image and resize it
+Test the model
+dotnet run -mode test -input <path>
+    Parameters:
+        -input <path> the path to the input image";
+            string mode = GetArgValue(args,"-mode");
+            // train command line
+            if(mode=="train")
+            {
+                string trainFolder = GetArgValue(args, "-trainFolder");
+                string labelWord = GetArgValue(args, "-labelWord");
+                int numIterations = int.Parse(GetArgValue(args, "-numIterations"));
+                double learningRate = double.Parse(GetArgValue(args,"-learningRate"));
+                // This method will generate w.data and b.data
+                Train(trainFolder,labelWord,numIterations,learningRate);
+            }
+            else if (mode=="test")
+            {
+                string inputPath = GetArgValue(args, "-input");
+                Image test = new Image(inputPath);
+                // Loads weight and bias created by the train method
+                Matrix w = new Matrix("w.data");
+                Matrix b = new Matrix("b.data");
 
-            Image test = new Image(args[0]);
-            test = Image.Resize(test, 500, 500);
-
-            // converts the input image to a matrix
-            // load w and b
-            Matrix x = ImageToMatrix(test);
-            Matrix w = new Matrix(args[1]);
-            Matrix b = new Matrix(args[2]);
-
-            // predict
-            Matrix z = w.T * x + b;
-            Matrix a = Sigmoid(z); // output
-            Console.WriteLine(a[0]);
-
-
+                Test(test,w,b);
+            }
+            else
+            {
+                Console.WriteLine(USAGE_INFO);
+                return;
+            }
         }
 
         /// <summary>
@@ -49,7 +68,7 @@ namespace Final_Project
         {
             double m = Y.Column;
             Matrix loss = -1 * (Matrix.Multiply(Y, Matrix.Log(A)) + Matrix.Multiply((1 - Y), Matrix.Log(1 - A)));
-            Matrix cost = (1 / m) * ( Matrix.Sum(loss) );
+            Matrix cost = (1 / m) * (Matrix.Sum(loss));
 
             return cost;
         }
@@ -135,9 +154,9 @@ namespace Final_Project
             return new Matrix[] { X, Y };
         }
 
-        static void Train(string trainFolder, int numIterations = 10, double learningRate = 0.003)
+        static void Train(string trainFolder,string labelWord, int numIterations = 10, double learningRate = 0.003)
         {
-            Matrix[] input = LoadInput(trainFolder, "yeye", 500, 500);
+            Matrix[] input = LoadInput(trainFolder, labelWord, 500, 500);
 
             Matrix X = input[0];
             Matrix Y = input[1];
@@ -151,7 +170,7 @@ namespace Final_Project
                 // forward propagation
                 Matrix Z = w.T * X + b;
                 Matrix A = Sigmoid(Z);
-                Matrix cost = Cost(A,Y);
+                Matrix cost = Cost(A, Y);
                 cost.Display();
 
                 // backward propagation
@@ -171,5 +190,64 @@ namespace Final_Project
             w.SaveMatrix("w.data");
             b.SaveMatrix("b.data");
         }
+
+        static void Test(Image test, Matrix w, Matrix b)
+        {
+            // load an input image and resize it
+            test = Image.Resize(test, 500, 500);
+
+            // converts the input image to a matrix
+            Matrix x = ImageToMatrix(test);
+
+            // predict
+            Matrix z = w.T * x + b;
+            Matrix a = Sigmoid(z); // output
+            Console.WriteLine(a[0]);
+        }
+        /// <summary>
+        /// Get the value of the corresponding agrument
+        /// </summary>
+        /// <param name="args">command line arguments</param>
+        /// <param name="argToFind">the argument to find</param>
+        /// <returns></returns>
+        public static string GetArgValue(string[] args, string argToFind)
+        {
+            for (int i = 0; i < args.Length; i++)
+            {
+                if (args[i] == argToFind)
+                {
+                    try
+                    {
+                        return args[i + 1];
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        return "";
+                    }
+                }
+            }
+            // if not exists
+            return "";
+        }
+
+
+        /// <summary>
+        /// returns true or false depending on whether args contains
+        /// </summary>
+        /// <param name="args">command line arguments</param>
+        /// <param name="argToFind">the specific arg to find</param>
+        /// <returns></returns>
+        public static bool CheckSingularArg(string[] args, string argToFind)
+        {
+            foreach (string arg in args)
+            {
+                if (arg == argToFind)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
 }
