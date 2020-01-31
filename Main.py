@@ -13,7 +13,7 @@ camera.stop_preview()
 print("recog")
 
 # get c# result
-stream = os.popen("dotnet run input.jpg")
+stream = os.popen("dotnet run -mode test -input input.jpg")
 output = stream.read()
 if(output =="1\n"):
     os.system("python move.py")
