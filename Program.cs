@@ -24,18 +24,18 @@ Test the model
 dotnet run -mode test -input <path>
     Parameters:
         -input <path> the path to the input image";
-            string mode = GetArgValue(args,"-mode");
+            string mode = GetArgValue(args, "-mode");
             // train command line
-            if(mode=="train")
+            if (mode == "train")
             {
                 string trainFolder = GetArgValue(args, "-trainFolder");
                 string labelWord = GetArgValue(args, "-labelWord");
                 int numIterations = int.Parse(GetArgValue(args, "-numIterations"));
-                double learningRate = double.Parse(GetArgValue(args,"-learningRate"));
+                double learningRate = double.Parse(GetArgValue(args, "-learningRate"));
                 // This method will generate w.data and b.data
-                Train(trainFolder,labelWord,numIterations,learningRate);
+                Train(trainFolder, labelWord, numIterations, learningRate);
             }
-            else if (mode=="test")
+            else if (mode == "test")
             {
                 string inputPath = GetArgValue(args, "-input");
                 Image test = new Image(inputPath);
@@ -43,7 +43,7 @@ dotnet run -mode test -input <path>
                 Matrix w = new Matrix("w.data");
                 Matrix b = new Matrix("b.data");
 
-                Test(test,w,b);
+                Test(test, w, b);
             }
             else
             {
@@ -154,7 +154,7 @@ dotnet run -mode test -input <path>
             return new Matrix[] { X, Y };
         }
 
-        static void Train(string trainFolder,string labelWord, int numIterations = 10, double learningRate = 0.003)
+        static void Train(string trainFolder, string labelWord, int numIterations = 10, double learningRate = 0.003)
         {
             Matrix[] input = LoadInput(trainFolder, labelWord, 500, 500);
 
@@ -170,8 +170,8 @@ dotnet run -mode test -input <path>
                 // forward propagation
                 Matrix Z = w.T * X + b;
                 Matrix A = Sigmoid(Z);
-                Matrix cost = Cost(A, Y);
-                cost.Display();
+                //Matrix cost = Cost(A, Y);
+                //cost.Display();
 
                 // backward propagation
                 Matrix dZ = A - Y;
@@ -183,9 +183,12 @@ dotnet run -mode test -input <path>
                 b = b - learningRate * db;
 
                 // display message
-                Z.Display();
+                Console.WriteLine($"==============Iteration: {i}==========================");
+                Console.WriteLine("The correct answers:");
+                Y.Display();
+                Console.WriteLine("The model's predictions:");
                 A.Display();
-                Console.WriteLine($"Iteration: {i}\n");
+                Console.WriteLine($"==============Iteration: {i}==========================");
             }
             w.SaveMatrix("w.data");
             b.SaveMatrix("b.data");
